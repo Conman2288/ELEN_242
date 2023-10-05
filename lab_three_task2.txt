@@ -1,0 +1,137 @@
+// Header files
+// From the C library
+#include <stdio.h>
+// From the Microblaze library
+#include "xil_printf.h"
+#include "xparameters.h"
+#include "mb_interface.h"
+// From the local folder
+#include "hw_registers.h"
+
+// Prototypes
+unsigned char getCharacter();
+void putCharacter(unsigned char ch);
+void putString(char *stringptr);
+
+ int main() {
+
+
+	putString("\0x1b[1e");
+
+	putString("\0x1b[1c");
+
+	putString("\0x1b[j");
+
+	// Prints out string on LCD
+	putString("Hello class");
+	getCharacter();
+
+}
+
+unsigned char getCharacter() {
+	unsigned char status, ch;
+
+	// read serial2 status
+	status = SERIAL2_STATUS;
+
+	// masking status with 0x01
+	status &= RX_FIFO_VALID_DATA;
+
+	while(!status) {
+		// read serial2 status
+		status = SERIAL2_STATUS;
+
+		// masking status with 0x01
+		status &= RX_FIFO_VALID_DATA;
+	}
+
+	// read data from the receive buffer
+	ch = SERIAL2_RX_FIFO;
+	return ch;
+}
+
+// This function takes a string literal input
+// and uses indexing to traverse the array
+/*
+void putString(unsigned char string[]) {
+	// counter
+	int i = 0;
+	char character;
+
+	// access first element in string literal
+	character = string[i];
+
+	// while our character in the string literal is not null
+	while (character != 0x00) {
+		putCharacter(character);
+		i++;
+		character = string[i];
+	}
+	return 0;
+}
+*/
+
+void putString(char *stringptr) {
+	char ch;
+	ch = *stringptr;
+
+	while (ch != 0x00) {
+		putCharacter(ch);
+		stringptr++;
+		ch = *stringptr;
+	}
+
+	return 0;
+
+}
+
+void putCharacter(unsigned char ch) {
+	unsigned char status;
+
+	// read the status register for serial port 2
+	status = SERIAL2_STATUS;
+
+	// mask out all bits except for the TX_FIFO_FULL (0x08)
+	status &= TX_FIFO_FULL;
+
+	while (status) {
+		// read the status register for serial port 2
+		status = SERIAL2_STATUS;
+
+		// mask out all bits except for the TX_FIFO_FULL (0x08)
+		status &= TX_FIFO_FULL;
+	}
+	SERIAL2_TX_FIFO = ch;
+}
+
+
+
+// Library of subroutines
+
+void delay_ms(unsigned short delay_time) {
+
+    // Declare local variables
+    unsigned short count;
+
+    // Outer for loop, delay_time is already initialized above
+    for (; delay_time > 0; delay_time--) {
+        // Inner for loop that causes 1 ms to go by
+        for (count=0; count<8300; count++){
+            // Do nothing for 1 ms
+        }
+    }
+}
+
+void delay_us(unsigned short delay_time) {
+
+    // Declare local variables
+    unsigned char count;
+
+    // Outer for loop, delay_time is already initialized above
+    for (; delay_time > 0; delay_time--) {
+        // Inner for loop that causes 1 us to go by
+        for (count=0; count<9; count++){
+            // Do nothing for 1 us
+        }
+    }
+}
