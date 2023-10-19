@@ -1,0 +1,63 @@
+// Header files
+// From the C library
+#include <stdio.h>
+// From the Microblaze library
+#include "xil_printf.h"
+#include "xparameters.h"
+#include "mb_interface.h"
+// From the local folder
+#include "hw_registers.h"
+
+
+#define CHAR_COUNT 7
+
+ int main() {
+
+	 // Declare variables
+	 unsigned char array[CHAR_COUNT];
+	 int counter;
+	 int sum;
+	 int whole_value;
+	 int remainder;
+	 int part_value;
+	 unsigned char *array_ptr;
+	 unsigned char ch;
+
+	 while(1) {
+		 printf("Please type seven numbers into terminal to find the average: ");
+		 counter = 0;
+		 array_ptr = &array;
+
+		 while (counter < CHAR_COUNT) {
+			 ch = getchar();
+			 if (ch >= 0x30 && ch <= 0x39) {
+				 putchar(ch);
+				 ch = (ch - '0');
+				 *array_ptr = ch;
+				 array_ptr++;
+				 counter++;
+			 }
+
+		 }
+
+		 printf("\n");
+		 fflush(stdout);
+		 array_ptr = &array;
+		 counter = 0;
+		 sum = 0;
+
+		 while(counter < CHAR_COUNT) {
+			 sum += *array_ptr;
+			 array_ptr++;
+			 counter++;
+		 }
+
+		 whole_value = sum / CHAR_COUNT;
+		 remainder = sum % CHAR_COUNT;
+		 part_value = remainder*1000 / CHAR_COUNT;
+
+		 printf("Sum: %d\tCount: %d\tAverage: %d.%d\n", sum, counter, whole_value, part_value);
+	 }
+
+}
+

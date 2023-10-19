@@ -1,0 +1,20 @@
+ int main() {
+	while(1) {
+		putString("\e[1e");
+
+		putString("\e[j");
+
+		putString("\e[0;5H");
+		putString("I Love");
+		delay_ms(2000);
+
+		// clear LCD
+		putString("\e[j");
+		putString("\e[1;0H");
+		putString("Microprocessors!");
+		delay_ms(2000);
+		putString("\e1b[j");
+
+	}
+
+}

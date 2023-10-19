@@ -1,0 +1,82 @@
+// Header files
+// From the C library
+#include <stdio.h>
+// From the Microblaze library
+#include "xil_printf.h"
+#include "xparameters.h"
+#include "mb_interface.h"
+// From the local folder
+#include "hw_registers.h"
+
+// Prototypes
+unsigned char getCharacter();
+void putCharacter(unsigned char ch);
+void putString(char *stringptr);
+
+ int main() {
+
+	 // Declare variables
+	 char ch;
+	 unsigned short leds, switches;
+	 switches = SWITCH_DATA;
+
+	 while(1) {
+		 printf("Enter a number ");
+
+		 ch = getchar();
+		 putchar(ch);
+
+		 // new line
+		 putchar(0x0a);
+
+		 if (ch >= '0' && ch <= '9') {
+			 if (ch == '0'){
+				 leds |= 0x0003;
+			 }
+
+			 else if (ch == '1') {
+				 leds |= 0x000c;
+			 }
+
+			 else if (ch == '2') {
+				 leds |= 0x0030;
+			 }
+
+			 else if (ch == '3') {
+				 leds |= 0x00c0;
+			 }
+
+			 else if (ch == '4') {
+				 leds |= 0x0300;
+			 }
+
+			 else if (ch == '5'){
+				 leds |= 0x0c00;
+			 }
+
+			 else if (ch == '6') {
+				 leds |= 0x3000;
+			 }
+
+			 else if (ch == '7') {
+				 leds |= 0xc000;
+			 }
+
+			 else if (ch == '8') {
+				 leds = 0xffff;
+			 }
+
+			 else if (ch == '9') {
+				 leds = 0x0000;
+			 }
+
+			 LED_DATA = leds;
+		 }
+
+		 else {
+			 printf("That is not a number.\n");
+
+	 }
+
+}
+}
