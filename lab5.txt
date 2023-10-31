@@ -1,0 +1,90 @@
+// Header files
+// From the C library
+#include <stdio.h>
+// From the Microblaze library
+#include "xil_printf.h"
+#include "xparameters.h"
+#include "mb_interface.h"
+// From the local folder
+#include "hw_registers.h"
+
+ void SPI_initialize();
+ void delay_us(unsigned short delay_time);
+ void SPI_joystick_exchange(unsigned char switches);
+
+ // Global Variables
+ unsigned char buttons;
+ unsigned short x_position, y_position;
+
+ int main() {
+	 unsigned char switches;
+
+	 SPI_initialize();
+	 while(1) {
+		 switches = SWITCH_DATA;
+		 switches &= 0x01;
+
+		 SPI_joystick_exchange(switches);
+
+		 printf("x-pos: 0x%03x   y-position: 0x%03x   \n", x_position, y_position);
+
+		 LED_DATA = buttons;
+	 }
+
+}
+
+ void SPI_initialize() {
+
+	 SPICR = MANUAL_SLAVE_SELECT + MASTER_MODE + SPI_ENABLED; //0x086;
+	 SPISSR = 1;
+ }
+
+ void SPI_joystick_exchange(unsigned char switches) {
+	 unsigned char xlow, xhigh, ylow, yhigh, status, dummy;
+	 SPISSR = 0;
+	 delay_us(15);
+
+	 switches |= 0x80;
+
+	 SPIDTR = switches;
+
+	 delay_us(10);
+
+	 for (int i = 0; i < 4; i++) {
+	 SPIDTR = dummy;
+	 delay_us(10);
+
+	 }
+
+	 status = SPISR;
+	 status &= SPI_TX_FIFO_EMPTY;
+
+	 while (status != SPI_TX_FIFO_EMPTY) {
+		 status = SPISR;
+		 status &= SPI_TX_FIFO_EMPTY;
+	 }
+
+	 xlow = SPIDRR;
+	 xhigh = SPIDRR;
+	 ylow = SPIDRR;
+	 yhigh = SPIDRR;
+	 buttons = SPIDRR;
+
+
+	 x_position = (xhigh <<8) + xlow; // xhigh*256
+	 y_position = (yhigh <<8) + ylow;
+
+	 SPISSR = 1;
+	 delay_us(25);
+ }
+
+ void delay_us(unsigned short delay_time) {
+	 unsigned char count;
+
+	 for(; delay_time > 0; delay_time--) {
+		 for (count = 0; count<9; count++) {
+
+		 }
+	 }
+ }
+
